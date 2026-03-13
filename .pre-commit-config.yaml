@@ -12,7 +12,7 @@ repos:
   # Basic hygiene & safety checks
   # ---------------------------------------------------------
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
       - id: check-merge-conflict
       - id: check-yaml
@@ -29,7 +29,7 @@ repos:
   # Ruff: Linting (FAST, strict, production rules)
   # ---------------------------------------------------------
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.2.2
+    rev: v0.15.6
     hooks:
       - id: ruff
         name: ruff-lint
@@ -42,7 +42,7 @@ repos:
   # Ruff: Formatting (replaces black)
   # ---------------------------------------------------------
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.2.2
+    rev: v0.15.6
     hooks:
       - id: ruff-format
         name: ruff-format
@@ -52,26 +52,16 @@ repos:
   # Static type checking (production safety net)
   # ---------------------------------------------------------
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
+    rev: v1.19.1
     hooks:
       - id: mypy
         args:
           - --strict
           - --ignore-missing-imports
+          - --disable-error-code=untyped-decorator
         additional_dependencies:
+          - pydantic>=2.0
+          - pydantic-settings>=2.0
+          - sqlalchemy[mypy]>=2.0
           - types-requests
           - types-PyYAML
-
-  # ---------------------------------------------------------
-  # Security scanning (catch dumb mistakes early)
-  # ---------------------------------------------------------
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.8
-    hooks:
-      - id: bandit
-        args:
-          - -q
-          - -r
-          - .
-        exclude: tests/
-

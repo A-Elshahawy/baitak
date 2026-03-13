@@ -3,6 +3,7 @@ uvicorn==0.41.0
 python-multipart==0.0.22
 python-dotenv==1.2.2
 pydantic==2.12.5
+email-validator==2.3.0
 pydantic-settings==2.13.1
 python-jose[cryptography]==3.5.0
 passlib[bcrypt]==1.7.4
@@ -11,3 +12,4 @@ alembic==1.18.4
 asyncpg==0.31.0
 httpx==0.28.1
 pre-commit==4.5.1
+aiosqlite==0.21.0
