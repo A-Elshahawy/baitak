@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from jose import jwt
@@ -19,10 +19,15 @@ def verify_password(password: str, hashed_password: str) -> bool:
 
 def create_access_token(subject: str, extra: dict[str, Any] | None = None) -> str:
     settings = get_settings()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     expire = now + timedelta(minutes=settings.access_token_expire_minutes)
-    payload: dict[str, Any] = {"sub": subject, "iat": int(now.timestamp()), "exp": int(expire.timestamp())}
+    payload: dict[str, Any] = {
+        "sub": subject,
+        "iat": int(now.timestamp()),
+        "exp": int(expire.timestamp()),
+    }
     if extra:
         payload.update(extra)
-    return jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)  # type: ignore[no-any-return]
-
+    return jwt.encode(  # type: ignore[no-any-return]
+        payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm
+    )

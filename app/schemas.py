@@ -1,7 +1,9 @@
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+# ── Auth / User ────────────────────────────────────────────────────────────────
 
 
 class UserCreate(BaseModel):
@@ -10,12 +12,21 @@ class UserCreate(BaseModel):
     password: str = Field(min_length=6, max_length=128)
 
 
+class UserUpdate(BaseModel):
+    name: str | None = Field(None, min_length=1, max_length=200)
+    commission_rate: float | None = Field(None, ge=0.0, le=1.0)
+
+
 class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     name: str
     email: EmailStr
+    commission_rate: float
+
+
+# ── Apartments ─────────────────────────────────────────────────────────────────
 
 
 class ApartmentBase(BaseModel):
@@ -36,9 +47,7 @@ class ApartmentUpdate(BaseModel):
     floor: int | None = None
 
 
-class BedBase(BaseModel):
-    label: str
-    price_monthly: int
+# ── Rooms ──────────────────────────────────────────────────────────────────────
 
 
 class RoomBase(BaseModel):
@@ -50,29 +59,29 @@ class RoomCreate(RoomBase):
     pass
 
 
+class RoomUpdate(BaseModel):
+    name: str | None = None
+    order_index: int | None = None
+
+
+# ── Beds ───────────────────────────────────────────────────────────────────────
+
+
+class BedBase(BaseModel):
+    label: str
+    price_monthly: int
+
+
 class BedCreate(BedBase):
     pass
 
 
-class BedOut(BedBase):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    tenant: Optional["TenantOut"] = None
+class BedUpdate(BaseModel):
+    label: str | None = None
+    price_monthly: int | None = Field(None, ge=0)
 
 
-class RoomOut(RoomBase):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    beds: list[BedOut] = []
-
-
-class ApartmentOut(ApartmentBase):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    rooms: list[RoomOut] = []
+# ── Tenants ────────────────────────────────────────────────────────────────────
 
 
 class TenantBase(BaseModel):
@@ -92,6 +101,40 @@ class TenantOut(TenantBase):
     active: bool
 
 
+class TenantWithContextOut(TenantOut):
+    """TenantOut enriched with apartment / room / bed location info."""
+
+    bed_id: int | None
+    bed_label: str | None
+    room_name: str | None
+    apt_id: int | None
+    apt_name: str | None
+
+
+class TenantUpdate(BaseModel):
+    name: str | None = None
+    phone: str | None = None
+    start_date: datetime | None = None
+
+
+# ── Payments ───────────────────────────────────────────────────────────────────
+
+
+class AssignTenantIn(BaseModel):
+    bed_id: int
+    name: str
+    phone: str
+    start_date: datetime
+    rent_amount: float = Field(ge=0)
+    month: str  # 'YYYY-MM'
+    mark_paid: bool = True
+
+
+class MarkPaidIn(BaseModel):
+    month: str  # 'YYYY-MM'
+    amount: float | None = Field(None, ge=0)
+
+
 class RentPaymentOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -101,25 +144,7 @@ class RentPaymentOut(BaseModel):
     status: Literal["paid", "unpaid"]
 
 
-class TenantUpdate(BaseModel):
-    name: str | None = None
-    phone: str | None = None
-    start_date: datetime | None = None
-
-
-class AssignTenantIn(BaseModel):
-    bed_id: int
-    name: str
-    phone: str
-    start_date: datetime
-    rent_amount: float
-    month: str  # 'YYYY-MM'
-    mark_paid: bool = True
-
-
-class MarkPaidIn(BaseModel):
-    month: str  # 'YYYY-MM'
-    amount: float | None = None
+# ── Stats ──────────────────────────────────────────────────────────────────────
 
 
 class OverviewOut(BaseModel):
@@ -137,6 +162,37 @@ class ApartmentStatsOut(BaseModel):
     beds_total: int
     beds_occupied: int
     revenue_monthly: float
+
+
+class EarningsOut(BaseModel):
+    total_revenue: float
+    commission_rate: float
+    commission_amount: float
+    apartments: list[ApartmentStatsOut]
+
+
+# Required for forward-ref resolution (TenantOut inside BedOut)
+
+
+class BedOut(BedBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    tenant: TenantOut | None = None
+
+
+class RoomOut(RoomBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    beds: list[BedOut] = []
+
+
+class ApartmentOut(ApartmentBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    rooms: list[RoomOut] = []
 
 
 BedOut.model_rebuild()

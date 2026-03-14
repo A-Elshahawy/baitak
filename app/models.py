@@ -23,6 +23,7 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(200))
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255))
+    commission_rate: Mapped[Decimal] = mapped_column(Numeric(4, 2), default=Decimal("0.50"))
 
     apartments: Mapped[list["Apartment"]] = relationship(
         back_populates="owner", cascade="all, delete-orphan"

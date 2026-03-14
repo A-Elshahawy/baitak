@@ -1,11 +1,14 @@
+from decimal import Decimal
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_db
+from ..deps import get_current_user
 from ..models import User
-from ..schemas import UserCreate, UserOut
+from ..schemas import UserCreate, UserOut, UserUpdate
 from ..security import create_access_token, hash_password, verify_password
 
 router = APIRouter()
@@ -48,3 +51,22 @@ async def login(payload: LoginIn, db: AsyncSession = Depends(get_db)) -> TokenOu
     token = create_access_token(str(user.id))
     return TokenOut(access_token=token)
 
+
+@router.get("/me", response_model=UserOut)
+async def get_me(user: User = Depends(get_current_user)) -> User:
+    return user
+
+
+@router.patch("/me", response_model=UserOut)
+async def update_me(
+    payload: UserUpdate,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    if payload.name is not None:
+        user.name = payload.name
+    if payload.commission_rate is not None:
+        user.commission_rate = Decimal(str(payload.commission_rate))
+    await db.commit()
+    await db.refresh(user)
+    return user

@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..db import get_db
 from ..deps import get_current_user
 from ..models import Apartment, Bed, RentPayment, Room, Tenant, User
-from ..schemas import ApartmentStatsOut, OverviewOut
+from ..schemas import ApartmentStatsOut, EarningsOut, OverviewOut
 
 router = APIRouter()
 
@@ -83,9 +83,9 @@ async def apartments_stats(
             func.count(Bed.id).label("beds_total"),
             func.count(Tenant.id).label("beds_occupied"),
             # Revenue = sum of price_monthly only for occupied beds
-            func.coalesce(
-                func.sum(Bed.price_monthly).filter(Tenant.id.is_not(None)), 0
-            ).label("revenue_monthly"),
+            func.coalesce(func.sum(Bed.price_monthly).filter(Tenant.id.is_not(None)), 0).label(
+                "revenue_monthly"
+            ),
         )
         .join(Room, Room.apartment_id == Apartment.id, isouter=True)
         .join(Bed, Bed.room_id == Room.id, isouter=True)
@@ -108,3 +108,18 @@ async def apartments_stats(
         )
         for apt_id, name, beds_total, beds_occupied, revenue_monthly in rows.all()
     ]
+
+
+@router.get("/earnings", response_model=EarningsOut)
+async def earnings(
+    user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
+) -> EarningsOut:
+    apts = await apartments_stats(user=user, db=db)
+    total_revenue = sum(a.revenue_monthly for a in apts)
+    rate = float(user.commission_rate)
+    return EarningsOut(
+        total_revenue=total_revenue,
+        commission_rate=rate,
+        commission_amount=round(total_revenue * rate, 2),
+        apartments=list(apts),
+    )

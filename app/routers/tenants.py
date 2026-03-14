@@ -17,14 +17,13 @@ from ..schemas import (
     RentPaymentOut,
     TenantOut,
     TenantUpdate,
+    TenantWithContextOut,
 )
 
 router = APIRouter()
 
 
-async def _bed_with_owner_check(
-    bed_id: int, user: User, db: AsyncSession
-) -> Bed:
+async def _bed_with_owner_check(bed_id: int, user: User, db: AsyncSession) -> Bed:
     result = await db.execute(
         select(Bed)
         .options(selectinload(Bed.room).selectinload(Room.apartment))
@@ -38,27 +37,44 @@ async def _bed_with_owner_check(
     return bed
 
 
-@router.get("/", response_model=list[TenantOut])
+@router.get("/", response_model=list[TenantWithContextOut])
 async def list_tenants(
     unpaid_only: bool = False,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Sequence[Tenant]:
+) -> list[TenantWithContextOut]:
     q = (
         select(Tenant)
         .join(Bed, Tenant.bed_id == Bed.id)
         .join(Room, Bed.room_id == Room.id)
         .join(Apartment, Room.apartment_id == Apartment.id)
         .where(and_(Apartment.owner_id == user.id, Tenant.active.is_(True)))
+        .options(selectinload(Tenant.bed).selectinload(Bed.room).selectinload(Room.apartment))
         .order_by(Tenant.id.desc())
     )
     if unpaid_only:
-        # tenant has any unpaid payment
-        q = q.join(RentPayment, RentPayment.tenant_id == Tenant.id).where(
-            RentPayment.status == "unpaid"
+        q = (
+            q.join(RentPayment, RentPayment.tenant_id == Tenant.id)
+            .where(RentPayment.status == "unpaid")
+            .distinct()
         )
     res = await db.execute(q)
-    return res.scalars().unique().all()
+    tenants = res.scalars().unique().all()
+    return [
+        TenantWithContextOut(
+            id=t.id,
+            name=t.name,
+            phone=t.phone,
+            start_date=t.start_date,
+            active=t.active,
+            bed_id=t.bed_id,
+            bed_label=t.bed.label if t.bed else None,
+            room_name=t.bed.room.name if t.bed else None,
+            apt_id=t.bed.room.apartment_id if t.bed else None,
+            apt_name=t.bed.room.apartment.name if t.bed else None,
+        )
+        for t in tenants
+    ]
 
 
 @router.post("/assign", response_model=TenantOut, status_code=status.HTTP_201_CREATED)
@@ -84,7 +100,7 @@ async def assign_tenant(
     payment = RentPayment(
         tenant_id=tenant.id,
         month=payload.month,
-        amount=payload.rent_amount,
+        amount=Decimal(str(payload.rent_amount)),
         status="paid" if payload.mark_paid else "unpaid",
     )
     db.add(payment)
@@ -199,4 +215,3 @@ async def mark_paid(
     await db.commit()
     await db.refresh(payment)
     return payment
-
