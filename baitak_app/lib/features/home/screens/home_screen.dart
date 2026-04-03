@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/stats.dart';
 import '../../../core/theme/colors.dart';
 import '../../auth/notifier/auth_notifier.dart';
+import '../../auth/widgets/profile_sheet.dart';
 import '../repo/home_repository.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -164,22 +165,31 @@ class _Header extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                width: 48,
-                height: 48,
-                decoration: const BoxDecoration(
-                  color: AppColors.gold,
-                  shape: BoxShape.circle,
+              GestureDetector(
+                onTap: () => showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useRootNavigator: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => const ProfileSheet(),
                 ),
-                child: Center(
-                  child: Text(
-                    userName.isEmpty
-                        ? 'ب'
-                        : userName.characters.first,
-                    style: GoogleFonts.cairo(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: const BoxDecoration(
+                    color: AppColors.gold,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      userName.isEmpty
+                          ? 'ب'
+                          : userName.characters.first,
+                      style: GoogleFonts.cairo(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
