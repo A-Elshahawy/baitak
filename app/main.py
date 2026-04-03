@@ -15,6 +15,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     yield
 
 
-app = FastAPI(title="Baitak API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="Baitak API", version="0.1.0", lifespan=lifespan, redirect_slashes=False)
 
 app.include_router(api_router, prefix="/api")

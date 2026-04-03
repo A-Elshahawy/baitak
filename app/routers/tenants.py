@@ -37,7 +37,7 @@ async def _bed_with_owner_check(bed_id: int, user: User, db: AsyncSession) -> Be
     return bed
 
 
-@router.get("/", response_model=list[TenantWithContextOut])
+@router.get("", response_model=list[TenantWithContextOut])
 async def list_tenants(
     unpaid_only: bool = False,
     user: User = Depends(get_current_user),
@@ -84,7 +84,10 @@ async def assign_tenant(
     db: AsyncSession = Depends(get_db),
 ) -> Tenant:
     bed = await _bed_with_owner_check(payload.bed_id, user, db)
-    if bed.tenant and bed.tenant.active:
+    existing = await db.execute(
+        select(Tenant).where(Tenant.bed_id == bed.id, Tenant.active.is_(True))
+    )
+    if existing.scalar_one_or_none():
         raise HTTPException(status_code=409, detail="Bed already occupied")
 
     tenant = Tenant(
@@ -211,6 +214,46 @@ async def mark_paid(
         payment.status = "paid"
         if payload.amount is not None:
             payment.amount = Decimal(str(payload.amount))
+
+    await db.commit()
+    await db.refresh(payment)
+    return payment
+
+
+@router.post("/{tenant_id}/payments/mark-unpaid", response_model=RentPaymentOut)
+async def mark_unpaid(
+    tenant_id: int,
+    payload: MarkPaidIn,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> RentPayment:
+    owner_check = await db.execute(
+        select(func.count())
+        .select_from(Tenant)
+        .join(Bed, Tenant.bed_id == Bed.id, isouter=True)
+        .join(Room, Bed.room_id == Room.id, isouter=True)
+        .join(Apartment, Room.apartment_id == Apartment.id, isouter=True)
+        .where(and_(Tenant.id == tenant_id, Apartment.owner_id == user.id))
+    )
+    if (owner_check.scalar_one() or 0) == 0:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+
+    res = await db.execute(
+        select(RentPayment).where(
+            and_(RentPayment.tenant_id == tenant_id, RentPayment.month == payload.month)
+        )
+    )
+    payment = res.scalar_one_or_none()
+    if not payment:
+        payment = RentPayment(
+            tenant_id=tenant_id,
+            month=payload.month,
+            amount=Decimal(str(payload.amount or 0)),
+            status="unpaid",
+        )
+        db.add(payment)
+    else:
+        payment.status = "unpaid"
 
     await db.commit()
     await db.refresh(payment)

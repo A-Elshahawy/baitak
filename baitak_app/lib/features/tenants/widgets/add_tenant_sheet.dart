@@ -33,6 +33,7 @@ class _AddTenantSheetState extends ConsumerState<AddTenantSheet> {
   Room? _selectedRoom;
   Bed? _selectedBed;
   DateTime _startDate = DateTime.now();
+  bool _markPaid = false;
   bool _isLoading = false;
 
   @override
@@ -92,6 +93,7 @@ class _AddTenantSheetState extends ConsumerState<AddTenantSheet> {
             startDate: _startDate,
             rentAmount: rentAmount,
             month: currentMonth(),
+            markPaid: _markPaid,
           );
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
@@ -115,12 +117,12 @@ class _AddTenantSheetState extends ConsumerState<AddTenantSheet> {
       padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
+        height: MediaQuery.of(context).size.height * 0.9,
         decoration: const BoxDecoration(
           color: AppColors.cream,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             _Header(
               currentStep: _currentStep,
@@ -184,6 +186,8 @@ class _AddTenantSheetState extends ConsumerState<AddTenantSheet> {
           rentController: _rentController,
           startDate: _startDate,
           onPickDate: _pickDate,
+          markPaid: _markPaid,
+          onMarkPaidChanged: (v) => setState(() => _markPaid = v),
           isLoading: _isLoading,
           onSubmit: _submit,
         );
@@ -252,11 +256,10 @@ class _PersonalInfoStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             'بيانات الساكن',
@@ -516,6 +519,8 @@ class _HousingDetailsStep extends StatelessWidget {
     required this.rentController,
     required this.startDate,
     required this.onPickDate,
+    required this.markPaid,
+    required this.onMarkPaidChanged,
     required this.isLoading,
     required this.onSubmit,
   });
@@ -528,6 +533,8 @@ class _HousingDetailsStep extends StatelessWidget {
   final TextEditingController rentController;
   final DateTime startDate;
   final VoidCallback onPickDate;
+  final bool markPaid;
+  final ValueChanged<bool> onMarkPaidChanged;
   final bool isLoading;
   final VoidCallback onSubmit;
 
@@ -612,7 +619,27 @@ class _HousingDetailsStep extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: AppColors.divider),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('تم الدفع؟', style: GoogleFonts.cairo(fontSize: 14)),
+                  Switch(
+                    value: markPaid,
+                    onChanged: onMarkPaidChanged,
+                    activeColor: AppColors.green,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
             SizedBox(
               height: 52,
               child: ElevatedButton(

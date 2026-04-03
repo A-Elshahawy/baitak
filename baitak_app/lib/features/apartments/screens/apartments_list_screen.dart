@@ -102,6 +102,7 @@ class ApartmentsListScreen extends ConsumerWidget {
                           await showModalBottomSheet<bool>(
                         context: context,
                         isScrollControlled: true,
+                        useRootNavigator: true,
                         backgroundColor: Colors.transparent,
                         builder: (_) =>
                             EditApartmentSheet(apt: apt),

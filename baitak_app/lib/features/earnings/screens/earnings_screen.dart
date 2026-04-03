@@ -3,10 +3,53 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/stats.dart';
 import '../../../core/theme/colors.dart';
+import '../../auth/notifier/auth_notifier.dart';
 import '../repo/earnings_repository.dart';
 
 class EarningsScreen extends ConsumerWidget {
   const EarningsScreen({super.key});
+
+  Future<void> _editCommission(
+      BuildContext context, WidgetRef ref, double current) async {
+    final controller = TextEditingController(
+      text: (current * 100).toInt().toString(),
+    );
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('تعديل نسبة العمولة', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          style: GoogleFonts.cairo(),
+          decoration: const InputDecoration(
+            suffixText: '%',
+            labelText: 'النسبة (0 - 100)',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('إلغاء', style: GoogleFonts.cairo()),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('حفظ', style: GoogleFonts.cairo(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      final rate = double.tryParse(controller.text);
+      if (rate != null && rate >= 0 && rate <= 100) {
+        await ref
+            .read(authNotifierProvider.notifier)
+            .updateUser(commissionRate: rate / 100);
+        ref.invalidate(earningsProvider);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -54,7 +97,10 @@ class EarningsScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _RevenueCard(earnings: earnings),
+                  _RevenueCard(
+                    earnings: earnings,
+                    onEditCommission: () => _editCommission(context, ref, earnings.commissionRate),
+                  ),
                   const SizedBox(height: 16),
                   if (earnings.apartments.isNotEmpty) ...[
                     Text(
@@ -80,9 +126,10 @@ class EarningsScreen extends ConsumerWidget {
 }
 
 class _RevenueCard extends StatelessWidget {
-  const _RevenueCard({required this.earnings});
+  const _RevenueCard({required this.earnings, required this.onEditCommission});
 
   final EarningsStats earnings;
+  final VoidCallback onEditCommission;
 
   @override
   Widget build(BuildContext context) {
@@ -150,8 +197,13 @@ class _RevenueCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.percent_rounded,
-                    color: AppColors.gold, size: 32),
+                IconButton(
+                  icon: const Icon(Icons.edit_rounded,
+                      color: AppColors.gold, size: 20),
+                  onPressed: onEditCommission,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
               ],
             ),
           ),

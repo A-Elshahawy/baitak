@@ -10,9 +10,16 @@
         "Dart-Code.flutter"
       ],
       "settings": {
-        "dart.flutterSdkPath": "/opt/flutter"
+        "dart.flutterSdkPath": "/opt/flutter",
+        "dart.flutterSdkPaths": ["/opt/flutter"],
+        "editor.formatOnSave": true
       }
     }
   },
-  "postCreateCommand": "flutter doctor -v"
+  "remoteEnv": {
+    "ANDROID_HOME": "/opt/android-sdk-linux",
+    "ANDROID_SDK_ROOT": "/opt/android-sdk-linux",
+    "PATH": "${containerEnv:PATH}:/opt/flutter/bin:/opt/android-sdk-linux/platform-tools"
+  },
+  "postCreateCommand": "cd /workspaces/baitak/baitak_app && flutter pub get && flutter doctor -v || true"
 }

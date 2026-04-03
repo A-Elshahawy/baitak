@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from ..db import get_db
 from ..deps import get_current_user
@@ -56,8 +58,10 @@ async def create_room(
     )
     db.add(room)
     await db.commit()
-    await db.refresh(room)
-    return room
+    result = await db.execute(
+        select(Room).options(selectinload(Room.beds).selectinload(Bed.tenant)).where(Room.id == room.id)
+    )
+    return result.scalar_one()
 
 
 @router.patch("/rooms/{room_id}", response_model=RoomOut)
@@ -71,8 +75,10 @@ async def update_room(
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(room, field, value)
     await db.commit()
-    await db.refresh(room)
-    return room
+    result = await db.execute(
+        select(Room).options(selectinload(Room.beds).selectinload(Bed.tenant)).where(Room.id == room.id)
+    )
+    return result.scalar_one()
 
 
 @router.delete("/rooms/{room_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
@@ -97,8 +103,10 @@ async def create_bed(
     bed = Bed(room_id=room.id, label=payload.label, price_monthly=payload.price_monthly)
     db.add(bed)
     await db.commit()
-    await db.refresh(bed)
-    return bed
+    result = await db.execute(
+        select(Bed).options(selectinload(Bed.tenant)).where(Bed.id == bed.id)
+    )
+    return result.scalar_one()
 
 
 @router.patch("/beds/{bed_id}", response_model=BedOut)
@@ -112,8 +120,10 @@ async def update_bed(
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(bed, field, value)
     await db.commit()
-    await db.refresh(bed)
-    return bed
+    result = await db.execute(
+        select(Bed).options(selectinload(Bed.tenant)).where(Bed.id == bed.id)
+    )
+    return result.scalar_one()
 
 
 @router.delete("/beds/{bed_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)

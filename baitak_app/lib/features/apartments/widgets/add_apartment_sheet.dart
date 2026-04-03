@@ -69,7 +69,8 @@ class _AddApartmentSheetState extends ConsumerState<AddApartmentSheet> {
   }
 
   int get _totalBeds => _rooms.fold(0, (s, r) => s + r.bedCount);
-  int get _totalRevenue => _rooms.fold(0, (s, r) => s + r.bedCount * r.price);
+  int get _totalRevenue => _rooms.fold(
+      0, (s, r) => s + r.bedCount * (int.tryParse(r.priceController.text) ?? r.price));
 
   Future<void> _save() async {
     setState(() => _isLoading = true);
@@ -119,7 +120,9 @@ class _AddApartmentSheetState extends ConsumerState<AddApartmentSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Container(
       decoration: const BoxDecoration(
         color: AppColors.cream,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -139,6 +142,7 @@ class _AddApartmentSheetState extends ConsumerState<AddApartmentSheet> {
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -163,6 +167,7 @@ class _AddApartmentSheetState extends ConsumerState<AddApartmentSheet> {
           rooms: _rooms,
           totalBeds: _totalBeds,
           totalRevenue: _totalRevenue,
+          onPriceChange: (i, price) => setState(() => _rooms[i].price = price),
           onAddRoom: () {
             setState(() {
               final n = _rooms.length + 1;
@@ -380,6 +385,7 @@ class _RoomsStep extends StatelessWidget {
     required this.onAddRoom,
     required this.onRemoveRoom,
     required this.onBedCountChange,
+    required this.onPriceChange,
     required this.onReview,
   });
 
@@ -389,6 +395,7 @@ class _RoomsStep extends StatelessWidget {
   final VoidCallback onAddRoom;
   final void Function(int index)? onRemoveRoom;
   final void Function(int index, int count) onBedCountChange;
+  final void Function(int index, int price) onPriceChange;
   final VoidCallback onReview;
 
   @override
@@ -454,7 +461,7 @@ class _RoomsStep extends StatelessWidget {
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          Text('عدد الأسرة: ',
+                          Text('عدد السراير: ',
                               style: GoogleFonts.cairo(
                                   fontSize: 13,
                                   color: AppColors.slate)),
@@ -502,6 +509,7 @@ class _RoomsStep extends StatelessWidget {
                         controller: room.priceController,
                         keyboardType: TextInputType.number,
                         style: GoogleFonts.cairo(),
+                        onChanged: (v) => onPriceChange(i, int.tryParse(v) ?? 0),
                         decoration: InputDecoration(
                           labelText: 'سعر السرير / شهر (EGP)',
                           labelStyle: GoogleFonts.cairo(

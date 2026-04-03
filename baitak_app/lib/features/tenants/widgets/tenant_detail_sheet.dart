@@ -185,16 +185,13 @@ class _TenantDetailSheetState extends ConsumerState<TenantDetailSheet> {
                       backgroundColor: AppColors.green,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    icon: const Icon(Icons.whatsapp, size: 18),
+                    icon: const Icon(Icons.chat, size: 18),
                     label: Text('واتساب',
                         style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
                     onPressed: () async {
-                      final url = 'https://wa.me/${tenant.phone.replaceAll(RegExp(r'[^0-9]'), '')}';
-                      final uri = Uri.parse(url);
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri,
-                            mode: LaunchMode.externalApplication);
-                      }
+                      final phone = tenant.phone.replaceAll(RegExp(r'[^0-9+]'), '');
+                      final uri = Uri.parse('https://wa.me/$phone');
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
                     },
                   ),
                 ),
@@ -238,6 +235,7 @@ class _TenantDetailSheetState extends ConsumerState<TenantDetailSheet> {
                       final result = await showModalBottomSheet<bool>(
                         context: context,
                         isScrollControlled: true,
+                        useRootNavigator: true,
                         backgroundColor: Colors.transparent,
                         builder: (_) => EditTenantSheet(
                           tenant: tenant,

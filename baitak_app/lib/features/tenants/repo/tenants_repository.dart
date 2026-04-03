@@ -27,9 +27,9 @@ class TenantsRepository {
     required DateTime startDate,
     required double rentAmount,
     required String month,
-    bool markPaid = true,
+    bool markPaid = false,
   }) async {
-    final response = await _dio.post('/tenants', data: {
+    final response = await _dio.post('/tenants/assign', data: {
       'bed_id': bedId,
       'name': name,
       'phone': phone,
@@ -65,7 +65,15 @@ class TenantsRepository {
   }) async {
     final data = <String, dynamic>{'month': month};
     if (amount != null) data['amount'] = amount;
-    await _dio.post('/tenants/$tenantId/pay', data: data);
+    await _dio.post('/tenants/$tenantId/payments/mark-paid', data: data);
+  }
+
+  Future<void> markUnpaid(
+    int tenantId, {
+    required String month,
+  }) async {
+    await _dio.post('/tenants/$tenantId/payments/mark-unpaid',
+        data: {'month': month});
   }
 }
 

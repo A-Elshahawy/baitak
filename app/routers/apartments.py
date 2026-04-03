@@ -13,7 +13,7 @@ from ..schemas import ApartmentCreate, ApartmentOut, ApartmentUpdate
 router = APIRouter()
 
 
-@router.get("/", response_model=list[ApartmentOut])
+@router.get("", response_model=list[ApartmentOut])
 async def list_apartments(
     user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ) -> Sequence[Apartment]:
@@ -26,7 +26,7 @@ async def list_apartments(
     return result.scalars().unique().all()
 
 
-@router.post("/", response_model=ApartmentOut, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ApartmentOut, status_code=status.HTTP_201_CREATED)
 async def create_apartment(
     payload: ApartmentCreate,
     user: User = Depends(get_current_user),
@@ -41,8 +41,12 @@ async def create_apartment(
     )
     db.add(ap)
     await db.commit()
-    await db.refresh(ap)
-    return ap
+    result = await db.execute(
+        select(Apartment)
+        .options(selectinload(Apartment.rooms).selectinload(Room.beds).selectinload(Bed.tenant))
+        .where(Apartment.id == ap.id)
+    )
+    return result.scalar_one()
 
 
 @router.get("/{apartment_id}", response_model=ApartmentOut)
@@ -77,8 +81,12 @@ async def update_apartment(
         setattr(ap, field, value)
 
     await db.commit()
-    await db.refresh(ap)
-    return ap
+    result = await db.execute(
+        select(Apartment)
+        .options(selectinload(Apartment.rooms).selectinload(Room.beds).selectinload(Bed.tenant))
+        .where(Apartment.id == ap.id)
+    )
+    return result.scalar_one()
 
 
 @router.delete("/{apartment_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)

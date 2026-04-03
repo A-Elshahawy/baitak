@@ -65,6 +65,7 @@ class ClientsScreen extends ConsumerWidget {
                           await showModalBottomSheet<bool>(
                         context: context,
                         isScrollControlled: true,
+                        useRootNavigator: true,
                         backgroundColor: Colors.transparent,
                         builder: (_) => const AddTenantSheet(),
                       );
@@ -147,6 +148,7 @@ class ClientsScreen extends ConsumerWidget {
                             showModalBottomSheet(
                               context: context,
                               isScrollControlled: true,
+                              useRootNavigator: true,
                               backgroundColor: Colors.transparent,
                               builder: (_) => TenantDetailSheet(
                                 tenant: t,
@@ -309,10 +311,7 @@ class _UnpaidCardState extends State<_UnpaidCard> {
                     icon: Icons.phone_rounded,
                     onTap: () async {
                       final uri = Uri.parse('tel:${t.phone}');
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri,
-                            mode: LaunchMode.externalApplication);
-                      }
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
                     },
                   ),
                   const SizedBox(width: 6),

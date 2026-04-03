@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' show Dio, Options;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/user.dart';
 import '../../../core/network/api_client.dart';
@@ -14,13 +14,7 @@ class AuthRepository {
   ) async {
     final response = await _dio.post(
       '/auth/login',
-      data: FormData.fromMap({
-        'username': email,
-        'password': password,
-      }),
-      options: Options(
-        contentType: 'application/x-www-form-urlencoded',
-      ),
+      data: {'email': email, 'password': password},
     );
     final token = response.data['access_token'] as String;
     final user = await getMe(token: token);

@@ -465,6 +465,7 @@ class _OccupiedBedCard extends StatelessWidget {
               showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
+                useRootNavigator: true,
                 backgroundColor: Colors.transparent,
                 builder: (_) {
                   final tenantCtx =
@@ -548,6 +549,7 @@ class _VacantBedCard extends StatelessWidget {
               final result = await showModalBottomSheet<bool>(
                 context: context,
                 isScrollControlled: true,
+                useRootNavigator: true,
                 backgroundColor: Colors.transparent,
                 builder: (_) => AddTenantSheet(
                   preselectedApt: apt,

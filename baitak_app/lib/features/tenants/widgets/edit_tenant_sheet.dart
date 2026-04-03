@@ -89,6 +89,8 @@ class _EditTenantSheetState extends ConsumerState<EditTenantSheet> {
           month: currentMonth(),
           amount: double.tryParse(_rentController.text),
         );
+      } else if (widget.isPaid && !_isPaid) {
+        await repo.markUnpaid(widget.tenant.id, month: currentMonth());
       }
 
       if (mounted) {

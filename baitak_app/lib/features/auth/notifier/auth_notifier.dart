@@ -52,6 +52,13 @@ class AuthNotifier extends AsyncNotifier<User?> {
     });
   }
 
+  Future<void> updateUser({double? commissionRate}) async {
+    final updated = await ref
+        .read(authRepositoryProvider)
+        .updateMe(commissionRate: commissionRate);
+    state = AsyncData(updated);
+  }
+
   Future<void> logout() async {
     await ref.read(secureStorageProvider).delete(key: 'auth_token');
     state = const AsyncData(null);
