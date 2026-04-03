@@ -52,10 +52,10 @@ class AuthNotifier extends AsyncNotifier<User?> {
     });
   }
 
-  Future<void> updateUser({double? commissionRate}) async {
+  Future<void> updateUser({String? name, double? commissionRate}) async {
     final updated = await ref
         .read(authRepositoryProvider)
-        .updateMe(commissionRate: commissionRate);
+        .updateMe(name: name, commissionRate: commissionRate);
     state = AsyncData(updated);
   }
 
