@@ -270,7 +270,7 @@ class _OccupancyStat extends StatelessWidget {
   }
 }
 
-class _RoomCard extends StatefulWidget {
+class _RoomCard extends ConsumerStatefulWidget {
   const _RoomCard({
     required this.room,
     required this.apt,
@@ -282,11 +282,44 @@ class _RoomCard extends StatefulWidget {
   final VoidCallback onChanged;
 
   @override
-  State<_RoomCard> createState() => _RoomCardState();
+  ConsumerState<_RoomCard> createState() => _RoomCardState();
 }
 
-class _RoomCardState extends State<_RoomCard> {
+class _RoomCardState extends ConsumerState<_RoomCard> {
   bool _isExpanded = false;
+
+  Future<void> _renameRoom(BuildContext context) async {
+    final controller = TextEditingController(text: widget.room.name);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('تعديل اسم الغرفة', style: GoogleFonts.cairo()),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          style: GoogleFonts.cairo(),
+          decoration: const InputDecoration(labelText: 'اسم الغرفة'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('إلغاء', style: GoogleFonts.cairo()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('حفظ',
+                style: GoogleFonts.cairo(color: AppColors.gold)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && controller.text.trim().isNotEmpty) {
+      await ref
+          .read(apartmentsRepositoryProvider)
+          .updateRoom(widget.room.id, name: controller.text.trim());
+      widget.onChanged();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -323,7 +356,13 @@ class _RoomCardState extends State<_RoomCard> {
                     style: GoogleFonts.cairo(
                         color: AppColors.slate, fontSize: 13),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
+                  GestureDetector(
+                    onTap: () => _renameRoom(context),
+                    child: const Icon(Icons.edit_outlined,
+                        color: AppColors.slate, size: 16),
+                  ),
+                  const SizedBox(width: 4),
                   AnimatedRotation(
                     turns: _isExpanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 200),
@@ -384,7 +423,7 @@ class _BedCard extends StatelessWidget {
   }
 }
 
-class _OccupiedBedCard extends StatelessWidget {
+class _OccupiedBedCard extends ConsumerWidget {
   const _OccupiedBedCard({
     required this.bed,
     required this.apt,
@@ -398,8 +437,63 @@ class _OccupiedBedCard extends StatelessWidget {
   final VoidCallback onChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tenant = bed.tenant!;
+
+    Future<void> editBed() async {
+      final labelCtrl = TextEditingController(text: bed.label);
+      final priceCtrl =
+          TextEditingController(text: bed.priceMonthly.toString());
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('تعديل بيانات السرير', style: GoogleFonts.cairo()),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: labelCtrl,
+                autofocus: true,
+                style: GoogleFonts.cairo(),
+                decoration:
+                    const InputDecoration(labelText: 'اسم السرير'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: priceCtrl,
+                keyboardType: TextInputType.number,
+                style: GoogleFonts.cairo(),
+                decoration: const InputDecoration(
+                    labelText: 'الإيجار الشهري (EGP)'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('إلغاء', style: GoogleFonts.cairo()),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('حفظ',
+                  style: GoogleFonts.cairo(color: AppColors.gold)),
+            ),
+          ],
+        ),
+      );
+      if (confirmed == true) {
+        final newPrice = int.tryParse(priceCtrl.text);
+        await ref.read(apartmentsRepositoryProvider).updateBed(
+              bed.id,
+              label: labelCtrl.text.trim().isNotEmpty
+                  ? labelCtrl.text.trim()
+                  : null,
+              priceMonthly: newPrice,
+            );
+        onChanged();
+      }
+    }
+
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
       padding: const EdgeInsets.all(12),
@@ -459,6 +553,12 @@ class _OccupiedBedCard extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           IconButton(
+            icon: const Icon(Icons.edit_outlined,
+                color: AppColors.slate, size: 18),
+            onPressed: editBed,
+          ),
+          const SizedBox(width: 4),
+          IconButton(
             icon: const Icon(Icons.visibility_outlined,
                 color: AppColors.gold, size: 18),
             onPressed: () {
@@ -486,7 +586,7 @@ class _OccupiedBedCard extends StatelessWidget {
   }
 }
 
-class _VacantBedCard extends StatelessWidget {
+class _VacantBedCard extends ConsumerWidget {
   const _VacantBedCard({
     required this.bed,
     required this.apt,
@@ -500,7 +600,61 @@ class _VacantBedCard extends StatelessWidget {
   final VoidCallback onChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    Future<void> editBed() async {
+      final labelCtrl = TextEditingController(text: bed.label);
+      final priceCtrl =
+          TextEditingController(text: bed.priceMonthly.toString());
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('تعديل بيانات السرير', style: GoogleFonts.cairo()),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: labelCtrl,
+                autofocus: true,
+                style: GoogleFonts.cairo(),
+                decoration:
+                    const InputDecoration(labelText: 'اسم السرير'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: priceCtrl,
+                keyboardType: TextInputType.number,
+                style: GoogleFonts.cairo(),
+                decoration: const InputDecoration(
+                    labelText: 'الإيجار الشهري (EGP)'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('إلغاء', style: GoogleFonts.cairo()),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('حفظ',
+                  style: GoogleFonts.cairo(color: AppColors.gold)),
+            ),
+          ],
+        ),
+      );
+      if (confirmed == true) {
+        final newPrice = int.tryParse(priceCtrl.text);
+        await ref.read(apartmentsRepositoryProvider).updateBed(
+              bed.id,
+              label: labelCtrl.text.trim().isNotEmpty
+                  ? labelCtrl.text.trim()
+                  : null,
+              priceMonthly: newPrice,
+            );
+        onChanged();
+      }
+    }
+
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
       padding: const EdgeInsets.all(12),
@@ -541,6 +695,11 @@ class _VacantBedCard extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit_outlined,
+                color: AppColors.slate, size: 18),
+            onPressed: editBed,
           ),
           IconButton(
             icon: const Icon(Icons.person_add_alt_1_rounded,
