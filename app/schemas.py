@@ -109,6 +109,7 @@ class TenantWithContextOut(TenantOut):
     room_name: str | None
     apt_id: int | None
     apt_name: str | None
+    rent_amount: float | None = None
 
 
 class TenantUpdate(BaseModel):

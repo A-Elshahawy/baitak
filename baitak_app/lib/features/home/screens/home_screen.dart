@@ -407,9 +407,12 @@ class _AptRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Row(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.push('/apartments/${apt.id}'),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
           children: [
             Container(
               width: 40,
@@ -450,6 +453,7 @@ class _AptRow extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

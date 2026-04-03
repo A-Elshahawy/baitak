@@ -47,14 +47,8 @@ class _AddTenantSheetState extends ConsumerState<AddTenantSheet> {
       _rentController.text = widget.preselectedBed!.priceMonthly.toString();
     }
 
-    // If apt is preselected, skip apt selection step
-    if (widget.preselectedApt != null && widget.preselectedBed != null) {
-      _currentStep = 3;
-    } else if (widget.preselectedApt != null) {
-      _currentStep = 2;
-    } else {
-      _currentStep = 0;
-    }
+    // Always start with personal info; skip steps after it if preselected
+    _currentStep = 0;
   }
 
   @override
@@ -146,7 +140,13 @@ class _AddTenantSheetState extends ConsumerState<AddTenantSheet> {
           onNext: () {
             if (_nameController.text.trim().isNotEmpty &&
                 _phoneController.text.trim().isNotEmpty) {
-              setState(() => _currentStep = 1);
+              if (widget.preselectedApt != null && widget.preselectedBed != null) {
+                setState(() => _currentStep = 3);
+              } else if (widget.preselectedApt != null) {
+                setState(() => _currentStep = 2);
+              } else {
+                setState(() => _currentStep = 1);
+              }
             }
           },
         );

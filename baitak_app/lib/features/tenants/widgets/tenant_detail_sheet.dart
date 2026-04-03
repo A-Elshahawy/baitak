@@ -6,7 +6,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/models/tenant.dart';
 import '../../../core/theme/colors.dart';
 import '../repo/tenants_repository.dart';
-import 'call_reminder_dialog.dart';
 import 'edit_tenant_sheet.dart';
 
 class TenantDetailSheet extends ConsumerStatefulWidget {
@@ -189,9 +188,9 @@ class _TenantDetailSheetState extends ConsumerState<TenantDetailSheet> {
                     label: Text('واتساب',
                         style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
                     onPressed: () async {
-                      final phone = tenant.phone.replaceAll(RegExp(r'[^0-9+]'), '');
-                      final uri = Uri.parse('https://wa.me/$phone');
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      final p = tenant.phone.replaceAll(RegExp(r'[^0-9+]'), '');
+                      await launchUrl(Uri.parse('https://wa.me/$p'),
+                          mode: LaunchMode.externalApplication);
                     },
                   ),
                 ),
@@ -202,17 +201,12 @@ class _TenantDetailSheetState extends ConsumerState<TenantDetailSheet> {
                       backgroundColor: AppColors.gold,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    icon: const Icon(Icons.notifications_outlined, size: 18),
-                    label: Text('تذكير',
+                    icon: const Icon(Icons.phone_rounded, size: 18),
+                    label: Text('اتصال',
                         style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => CallReminderDialog(
-                          tenantName: tenant.name,
-                          phone: tenant.phone,
-                        ),
-                      );
+                    onPressed: () async {
+                      await launchUrl(Uri.parse('tel:${tenant.phone}'),
+                          mode: LaunchMode.externalApplication);
                     },
                   ),
                 ),

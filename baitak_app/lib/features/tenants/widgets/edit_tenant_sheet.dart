@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/models/tenant.dart';
 import '../../../core/theme/colors.dart';
+import '../../apartments/repo/apartments_repository.dart';
 import '../repo/tenants_repository.dart';
 
 class EditTenantSheet extends ConsumerStatefulWidget {
@@ -91,6 +92,16 @@ class _EditTenantSheetState extends ConsumerState<EditTenantSheet> {
         );
       } else if (widget.isPaid && !_isPaid) {
         await repo.markUnpaid(widget.tenant.id, month: currentMonth());
+      }
+
+      final newRent = int.tryParse(_rentController.text);
+      if (newRent != null &&
+          newRent != widget.rent.toInt() &&
+          widget.tenant.bedId != null) {
+        await ref.read(apartmentsRepositoryProvider).updateBed(
+              widget.tenant.bedId!,
+              priceMonthly: newRent,
+            );
       }
 
       if (mounted) {

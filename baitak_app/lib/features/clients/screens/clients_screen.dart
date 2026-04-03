@@ -306,12 +306,23 @@ class _UnpaidCardState extends State<_UnpaidCard> {
               Row(
                 children: [
                   _SmallButton(
-                    label: 'اتصال',
+                    label: 'واتساب',
                     color: AppColors.green,
+                    icon: Icons.chat,
+                    onTap: () async {
+                      final p = _normalizePhoneForWa(t.phone);
+                      await launchUrl(Uri.parse('https://wa.me/$p'),
+                          mode: LaunchMode.externalApplication);
+                    },
+                  ),
+                  const SizedBox(width: 6),
+                  _SmallButton(
+                    label: 'اتصال',
+                    color: AppColors.gold,
                     icon: Icons.phone_rounded,
                     onTap: () async {
-                      final uri = Uri.parse('tel:${t.phone}');
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      await launchUrl(Uri.parse('tel:${t.phone}'),
+                          mode: LaunchMode.externalApplication);
                     },
                   ),
                   const SizedBox(width: 6),
@@ -351,6 +362,16 @@ class _UnpaidCardState extends State<_UnpaidCard> {
       ),
     );
   }
+}
+
+String _normalizePhoneForWa(String phone) {
+  final digits = phone.replaceAll(RegExp(r'[^0-9]'), '');
+  if (digits.startsWith('0') && digits.length >= 10) {
+    return '20${digits.substring(1)}';
+  }
+  if (digits.startsWith('20')) return digits;
+  if (digits.startsWith('+20')) return digits.substring(1);
+  return digits;
 }
 
 class _SmallButton extends StatelessWidget {

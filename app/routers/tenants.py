@@ -72,6 +72,7 @@ async def list_tenants(
             room_name=t.bed.room.name if t.bed else None,
             apt_id=t.bed.room.apartment_id if t.bed else None,
             apt_name=t.bed.room.apartment.name if t.bed else None,
+            rent_amount=float(t.bed.price_monthly) if t.bed else None,
         )
         for t in tenants
     ]
