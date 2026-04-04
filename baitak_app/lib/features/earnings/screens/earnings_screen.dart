@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/stats.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/widgets/shimmer_widgets.dart';
 import '../../auth/notifier/auth_notifier.dart';
 import '../repo/earnings_repository.dart';
 
@@ -63,8 +64,7 @@ class EarningsScreen extends ConsumerWidget {
           color: AppColors.gold,
           onRefresh: () async => ref.invalidate(earningsProvider),
           child: earningsAsync.when(
-            loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.gold)),
+            loading: () => const EarningsShimmer(),
             error: (e, _) => Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

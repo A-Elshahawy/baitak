@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/apartment.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/widgets/shimmer_widgets.dart';
 import '../repo/apartments_repository.dart';
 import '../widgets/edit_apartment_sheet.dart';
 
@@ -23,8 +24,7 @@ class ApartmentsListScreen extends ConsumerWidget {
         color: AppColors.gold,
         onRefresh: () async => ref.invalidate(apartmentsListProvider),
         child: aptsAsync.when(
-          loading: () => const Center(
-              child: CircularProgressIndicator(color: AppColors.gold)),
+          loading: () => const ApartmentsListShimmer(),
           error: (e, _) => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

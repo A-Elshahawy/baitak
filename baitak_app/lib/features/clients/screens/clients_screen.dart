@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/models/tenant.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/widgets/shimmer_widgets.dart';
 import '../../../core/utils/phone_utils.dart';
 import '../../tenants/repo/tenants_repository.dart';
 import '../../tenants/widgets/add_tenant_sheet.dart';
@@ -28,8 +29,7 @@ class ClientsScreen extends ConsumerWidget {
             ref.invalidate(unpaidTenantsProvider);
           },
           child: allTenantsAsync.when(
-            loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.gold)),
+            loading: () => const ClientsShimmer(),
             error: (e, _) => Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/stats.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/widgets/shimmer_widgets.dart';
 import '../../auth/notifier/auth_notifier.dart';
 import '../../auth/widgets/profile_sheet.dart';
 import '../repo/home_repository.dart';
@@ -25,8 +26,7 @@ class HomeScreen extends ConsumerWidget {
         ref.invalidate(apartmentsStatsProvider);
       },
       child: overviewAsync.when(
-        loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.gold)),
+        loading: () => const HomeShimmer(),
         error: (e, _) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -72,12 +72,10 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
               aptsStatsAsync.when(
-                loading: () => const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.gold)),
+                loading: () => SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (_, __) => const AptRowShimmer(),
+                    childCount: 3,
                   ),
                 ),
                 error: (e, _) => SliverToBoxAdapter(
