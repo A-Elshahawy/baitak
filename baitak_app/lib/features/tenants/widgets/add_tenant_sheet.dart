@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/models/apartment.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/utils/phone_utils.dart';
 import '../../apartments/repo/apartments_repository.dart';
 import '../repo/tenants_repository.dart';
 
@@ -75,6 +76,19 @@ class _AddTenantSheetState extends ConsumerState<AddTenantSheet> {
     if (_nameController.text.trim().isEmpty ||
         _phoneController.text.trim().isEmpty) return;
 
+    if (!PhoneUtils.isValid(_phoneController.text)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('رقم التليفون غلط — لازم يبدأ بـ 01 ويكون 11 رقم',
+                style: GoogleFonts.cairo(color: Colors.white)),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      }
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
       final rentAmount =
@@ -83,7 +97,7 @@ class _AddTenantSheetState extends ConsumerState<AddTenantSheet> {
       await ref.read(tenantsRepositoryProvider).assignTenant(
             bedId: _selectedBed!.id,
             name: _nameController.text.trim(),
-            phone: _phoneController.text.trim(),
+            phone: PhoneUtils.normalize(_phoneController.text.trim()),
             startDate: _startDate,
             rentAmount: rentAmount,
             month: currentMonth(),

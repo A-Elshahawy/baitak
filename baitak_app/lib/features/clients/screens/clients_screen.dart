@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/models/tenant.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/utils/phone_utils.dart';
 import '../../tenants/repo/tenants_repository.dart';
 import '../../tenants/widgets/add_tenant_sheet.dart';
 import '../../tenants/widgets/tenant_detail_sheet.dart';
@@ -313,7 +314,7 @@ class _UnpaidCardState extends State<_UnpaidCard> {
                 color: AppColors.green,
                 icon: Icons.chat,
                 onTap: () async {
-                  final p = _normalizePhoneForWa(t.phone);
+                  final p = PhoneUtils.toWhatsApp(t.phone);
                   await launchUrl(Uri.parse('https://wa.me/$p'),
                       mode: LaunchMode.externalApplication);
                 },
@@ -363,16 +364,6 @@ class _UnpaidCardState extends State<_UnpaidCard> {
       ),
     );
   }
-}
-
-String _normalizePhoneForWa(String phone) {
-  final digits = phone.replaceAll(RegExp(r'[^0-9]'), '');
-  if (digits.startsWith('0') && digits.length >= 10) {
-    return '20${digits.substring(1)}';
-  }
-  if (digits.startsWith('20')) return digits;
-  if (digits.startsWith('+20')) return digits.substring(1);
-  return digits;
 }
 
 class _SmallButton extends StatelessWidget {

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/models/tenant.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/utils/phone_utils.dart';
 import '../repo/tenants_repository.dart';
 import 'edit_tenant_sheet.dart';
 
@@ -188,7 +189,7 @@ class _TenantDetailSheetState extends ConsumerState<TenantDetailSheet> {
                     label: Text('واتساب',
                         style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
                     onPressed: () async {
-                      final p = tenant.phone.replaceAll(RegExp(r'[^0-9+]'), '');
+                      final p = PhoneUtils.toWhatsApp(tenant.phone);
                       await launchUrl(Uri.parse('https://wa.me/$p'),
                           mode: LaunchMode.externalApplication);
                     },

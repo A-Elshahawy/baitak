@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/models/tenant.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/utils/phone_utils.dart';
 import '../../apartments/repo/apartments_repository.dart';
 import '../repo/tenants_repository.dart';
 
@@ -74,13 +75,24 @@ class _EditTenantSheetState extends ConsumerState<EditTenantSheet> {
       return;
     }
 
+    if (!PhoneUtils.isValid(_phoneController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('رقم التليفون غلط — لازم يبدأ بـ 01 ويكون 11 رقم',
+              style: GoogleFonts.cairo()),
+          backgroundColor: AppColors.red,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
       final repo = ref.read(tenantsRepositoryProvider);
       await repo.updateTenant(
         widget.tenant.id,
         name: _nameController.text.trim(),
-        phone: _phoneController.text.trim(),
+        phone: PhoneUtils.normalize(_phoneController.text.trim()),
         startDate: _startDate,
       );
 
