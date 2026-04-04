@@ -130,6 +130,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             if (v == null || v.trim().isEmpty) {
                               return 'من فضلك أدخل البريد الإلكتروني';
                             }
+                            final emailRegex = RegExp(r'^[\w.]+@[\w.]+\.\w+$');
+                            if (!emailRegex.hasMatch(v.trim())) {
+                              return 'بريد إلكتروني غير صحيح';
+                            }
                             return null;
                           },
                         ),

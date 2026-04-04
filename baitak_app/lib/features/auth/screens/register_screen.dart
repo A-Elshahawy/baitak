@@ -158,7 +158,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             if (v == null || v.trim().isEmpty) {
                               return 'من فضلك أدخل البريد الإلكتروني';
                             }
-                            if (!v.contains('@')) {
+                            final emailRegex = RegExp(r'^[\w.]+@[\w.]+\.\w+$');
+                            if (!emailRegex.hasMatch(v.trim())) {
                               return 'بريد إلكتروني غير صحيح';
                             }
                             return null;

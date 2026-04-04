@@ -86,6 +86,19 @@ class _EditTenantSheetState extends ConsumerState<EditTenantSheet> {
       return;
     }
 
+    final rentText = _rentController.text.trim();
+    final newRent = int.tryParse(rentText);
+    if (newRent == null || newRent <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('الإيجار لازم يكون رقم أكبر من صفر',
+              style: GoogleFonts.cairo()),
+          backgroundColor: AppColors.red,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
       final repo = ref.read(tenantsRepositoryProvider);
@@ -100,15 +113,13 @@ class _EditTenantSheetState extends ConsumerState<EditTenantSheet> {
         await repo.markPaid(
           widget.tenant.id,
           month: currentMonth(),
-          amount: double.tryParse(_rentController.text),
+          amount: newRent.toDouble(),
         );
       } else if (widget.isPaid && !_isPaid) {
         await repo.markUnpaid(widget.tenant.id, month: currentMonth());
       }
 
-      final newRent = int.tryParse(_rentController.text);
-      if (newRent != null &&
-          newRent != widget.rent.toInt() &&
+      if (newRent != widget.rent.toInt() &&
           widget.tenant.bedId != null) {
         await ref.read(apartmentsRepositoryProvider).updateBed(
               widget.tenant.bedId!,

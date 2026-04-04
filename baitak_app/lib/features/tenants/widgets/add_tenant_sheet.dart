@@ -89,11 +89,23 @@ class _AddTenantSheetState extends ConsumerState<AddTenantSheet> {
       return;
     }
 
+    final rentText = _rentController.text.trim();
+    final rentAmount = double.tryParse(rentText);
+    if (rentAmount == null || rentAmount <= 0) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('الإيجار لازم يكون رقم أكبر من صفر',
+                style: GoogleFonts.cairo(color: Colors.white)),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      }
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
-      final rentAmount =
-          double.tryParse(_rentController.text) ??
-              _selectedBed!.priceMonthly.toDouble();
       await ref.read(tenantsRepositoryProvider).assignTenant(
             bedId: _selectedBed!.id,
             name: _nameController.text.trim(),
