@@ -99,6 +99,7 @@ class TenantOut(TenantBase):
 
     id: int
     active: bool
+    has_unpaid: bool = False
 
 
 class TenantWithContextOut(TenantOut):

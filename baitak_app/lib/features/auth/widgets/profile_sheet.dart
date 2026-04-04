@@ -142,7 +142,7 @@ class _ProfileSheetState extends ConsumerState<ProfileSheet> {
               ),
               const SizedBox(height: 24),
               SizedBox(
-                height: 52,
+                height: 57,
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _save,

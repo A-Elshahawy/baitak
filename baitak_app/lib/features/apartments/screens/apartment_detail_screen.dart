@@ -140,7 +140,7 @@ class _AptDetailBody extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: SizedBox(
-            height: 52,
+            height: 57,
             child: ElevatedButton.icon(
               icon: const Icon(Icons.person_add_alt_1_rounded,
                   color: Colors.white),
@@ -572,7 +572,7 @@ class _OccupiedBedCard extends ConsumerWidget {
                       _buildTenantWithContext(tenant, bed, room, apt);
                   return TenantDetailSheet(
                     tenant: tenantCtx,
-                    isPaid: true,
+                    isPaid: !tenant.hasUnpaid,
                     rent: bed.priceMonthly.toDouble(),
                     onChanged: onChanged,
                   );

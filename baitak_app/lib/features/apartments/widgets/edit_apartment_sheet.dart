@@ -256,7 +256,7 @@ class _EditApartmentSheetState extends ConsumerState<EditApartmentSheet>
             padding: EdgeInsets.fromLTRB(
                 16, 8, 16, MediaQuery.of(context).padding.bottom + 16),
             child: SizedBox(
-              height: 52,
+              height: 57,
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _save,
@@ -570,7 +570,7 @@ class _RoomsTab extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.gold,
             side: const BorderSide(color: AppColors.gold),
-            minimumSize: const Size.fromHeight(44),
+            minimumSize: const Size.fromHeight(49),
           ),
           icon: const Icon(Icons.add),
           label: Text('إضافة غرفة', style: GoogleFonts.cairo()),

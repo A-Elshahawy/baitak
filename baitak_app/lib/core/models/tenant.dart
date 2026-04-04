@@ -5,6 +5,7 @@ class TenantOut {
     required this.phone,
     required this.startDate,
     required this.active,
+    this.hasUnpaid = false,
   });
 
   final int id;
@@ -12,6 +13,7 @@ class TenantOut {
   final String phone;
   final DateTime startDate;
   final bool active;
+  final bool hasUnpaid;
 
   factory TenantOut.fromJson(Map<String, dynamic> json) => TenantOut(
         id: json['id'] as int,
@@ -19,6 +21,7 @@ class TenantOut {
         phone: json['phone'] as String,
         startDate: DateTime.parse(json['start_date'] as String),
         active: json['active'] as bool,
+        hasUnpaid: json['has_unpaid'] as bool? ?? false,
       );
 
   Map<String, dynamic> toJson() => {
@@ -27,6 +30,7 @@ class TenantOut {
         'phone': phone,
         'start_date': startDate.toIso8601String(),
         'active': active,
+        'has_unpaid': hasUnpaid,
       };
 
   TenantOut copyWith({
@@ -35,6 +39,7 @@ class TenantOut {
     String? phone,
     DateTime? startDate,
     bool? active,
+    bool? hasUnpaid,
   }) {
     return TenantOut(
       id: id ?? this.id,
@@ -42,6 +47,7 @@ class TenantOut {
       phone: phone ?? this.phone,
       startDate: startDate ?? this.startDate,
       active: active ?? this.active,
+      hasUnpaid: hasUnpaid ?? this.hasUnpaid,
     );
   }
 }
@@ -75,6 +81,7 @@ class TenantWithContext extends TenantOut {
         phone: json['phone'] as String,
         startDate: DateTime.parse(json['start_date'] as String),
         active: json['active'] as bool,
+        hasUnpaid: json['has_unpaid'] as bool? ?? false,
         bedId: json['bed_id'] as int?,
         bedLabel: json['bed_label'] as String?,
         roomName: json['room_name'] as String?,
@@ -102,6 +109,7 @@ class TenantWithContext extends TenantOut {
     String? phone,
     DateTime? startDate,
     bool? active,
+    bool? hasUnpaid,
     int? bedId,
     String? bedLabel,
     String? roomName,
@@ -115,6 +123,7 @@ class TenantWithContext extends TenantOut {
       phone: phone ?? this.phone,
       startDate: startDate ?? this.startDate,
       active: active ?? this.active,
+      hasUnpaid: hasUnpaid ?? this.hasUnpaid,
       bedId: bedId ?? this.bedId,
       bedLabel: bedLabel ?? this.bedLabel,
       roomName: roomName ?? this.roomName,

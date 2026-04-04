@@ -182,7 +182,7 @@ class _TenantDetailSheetState extends ConsumerState<TenantDetailSheet> {
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.green,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 17),
                     ),
                     icon: const Icon(Icons.chat, size: 18),
                     label: Text('واتساب',
@@ -199,7 +199,7 @@ class _TenantDetailSheetState extends ConsumerState<TenantDetailSheet> {
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.gold,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 17),
                     ),
                     icon: const Icon(Icons.phone_rounded, size: 18),
                     label: Text('اتصال',

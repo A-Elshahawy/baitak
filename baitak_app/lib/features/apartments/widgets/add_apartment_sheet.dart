@@ -363,7 +363,7 @@ class _AptInfoStep extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           SizedBox(
-            height: 52,
+            height: 57,
             child: ElevatedButton(
               onPressed: onNext,
               child: Text('التالي',
@@ -547,7 +547,7 @@ class _RoomsStep extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.gold,
               side: const BorderSide(color: AppColors.gold, style: BorderStyle.solid),
-              minimumSize: const Size.fromHeight(44),
+              minimumSize: const Size.fromHeight(49),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),
@@ -580,7 +580,7 @@ class _RoomsStep extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
           child: SizedBox(
-            height: 52,
+            height: 57,
             child: ElevatedButton(
               onPressed: onReview,
               child: Text('مراجعة',
@@ -698,7 +698,7 @@ class _ReviewStep extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           SizedBox(
-            height: 52,
+            height: 57,
             child: ElevatedButton(
               onPressed: isLoading ? null : onSave,
               child: isLoading

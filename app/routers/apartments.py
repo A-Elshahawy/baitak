@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from ..db import get_db
 from ..deps import get_current_user
-from ..models import Apartment, Bed, Room, User
+from ..models import Apartment, Bed, RentPayment, Room, Tenant, User
 from ..schemas import ApartmentCreate, ApartmentOut, ApartmentUpdate
 
 router = APIRouter()
@@ -19,7 +19,12 @@ async def list_apartments(
 ) -> Sequence[Apartment]:
     result = await db.execute(
         select(Apartment)
-        .options(selectinload(Apartment.rooms).selectinload(Room.beds).selectinload(Bed.tenant))
+        .options(
+            selectinload(Apartment.rooms)
+            .selectinload(Room.beds)
+            .selectinload(Bed.tenant)
+            .selectinload(Tenant.payments)
+        )
         .where(Apartment.owner_id == user.id)
         .order_by(Apartment.id)
     )
@@ -43,7 +48,12 @@ async def create_apartment(
     await db.commit()
     result = await db.execute(
         select(Apartment)
-        .options(selectinload(Apartment.rooms).selectinload(Room.beds).selectinload(Bed.tenant))
+        .options(
+            selectinload(Apartment.rooms)
+            .selectinload(Room.beds)
+            .selectinload(Bed.tenant)
+            .selectinload(Tenant.payments)
+        )
         .where(Apartment.id == ap.id)
     )
     return result.scalar_one()
@@ -57,7 +67,12 @@ async def get_apartment(
 ) -> Apartment:
     result = await db.execute(
         select(Apartment)
-        .options(selectinload(Apartment.rooms).selectinload(Room.beds).selectinload(Bed.tenant))
+        .options(
+            selectinload(Apartment.rooms)
+            .selectinload(Room.beds)
+            .selectinload(Bed.tenant)
+            .selectinload(Tenant.payments)
+        )
         .where(Apartment.id == apartment_id)
     )
     ap = result.scalar_one_or_none()
@@ -83,7 +98,12 @@ async def update_apartment(
     await db.commit()
     result = await db.execute(
         select(Apartment)
-        .options(selectinload(Apartment.rooms).selectinload(Room.beds).selectinload(Bed.tenant))
+        .options(
+            selectinload(Apartment.rooms)
+            .selectinload(Room.beds)
+            .selectinload(Bed.tenant)
+            .selectinload(Tenant.payments)
+        )
         .where(Apartment.id == ap.id)
     )
     return result.scalar_one()

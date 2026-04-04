@@ -293,7 +293,7 @@ class _PersonalInfoStep extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           SizedBox(
-            height: 52,
+            height: 57,
             child: ElevatedButton(
               onPressed: onNext,
               child: Text('التالي',
@@ -641,7 +641,7 @@ class _HousingDetailsStep extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             SizedBox(
-              height: 52,
+              height: 57,
               child: ElevatedButton(
                 onPressed: isLoading ? null : onSubmit,
                 child: isLoading

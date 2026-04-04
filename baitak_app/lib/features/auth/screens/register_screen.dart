@@ -197,7 +197,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                         const SizedBox(height: 24),
                         SizedBox(
-                          height: 52,
+                          height: 57,
                           child: ElevatedButton(
                             onPressed: isLoading ? null : _submit,
                             child: isLoading

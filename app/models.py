@@ -89,6 +89,13 @@ class Tenant(Base):
         back_populates="tenant", cascade="all, delete-orphan"
     )
 
+    @property
+    def has_unpaid(self) -> bool:
+        from datetime import UTC, datetime
+
+        current_month = datetime.now(UTC).strftime("%Y-%m")
+        return any(p.status == "unpaid" and p.month == current_month for p in self.payments)
+
 
 class RentPayment(Base):
     __tablename__ = "rent_payments"

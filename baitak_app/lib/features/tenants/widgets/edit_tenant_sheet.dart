@@ -321,7 +321,7 @@ class _EditTenantSheetState extends ConsumerState<EditTenantSheet> {
               ),
               const SizedBox(height: 24),
               SizedBox(
-                height: 52,
+                height: 57,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _save,
                   child: _isLoading

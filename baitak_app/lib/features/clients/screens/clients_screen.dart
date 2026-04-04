@@ -217,7 +217,7 @@ class _ClientsHeader extends StatelessWidget {
               foregroundColor: AppColors.gold,
               side: const BorderSide(color: AppColors.gold),
               padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
             ),
@@ -258,41 +258,41 @@ class _UnpaidCardState extends State<_UnpaidCard> {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: AppColors.red,
-            child: Text(
-              initial,
-              style: GoogleFonts.cairo(
-                  color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  t.name,
-                  style: GoogleFonts.cairo(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.charcoal,
-                    fontSize: 14,
-                  ),
-                ),
-                Text(
-                  t.breadcrumb,
-                  style: GoogleFonts.cairo(
-                      color: AppColors.slate, fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          Row(
             children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: AppColors.red,
+                child: Text(
+                  initial,
+                  style: GoogleFonts.cairo(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      t.name,
+                      style: GoogleFonts.cairo(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.charcoal,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      t.breadcrumb,
+                      style: GoogleFonts.cairo(
+                          color: AppColors.slate, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
               if (t.rentAmount != null)
                 Text(
                   'EGP ${t.rentAmount!.toStringAsFixed(0)}',
@@ -302,59 +302,60 @@ class _UnpaidCardState extends State<_UnpaidCard> {
                     fontSize: 13,
                   ),
                 ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  _SmallButton(
-                    label: 'واتساب',
-                    color: AppColors.green,
-                    icon: Icons.chat,
-                    onTap: () async {
-                      final p = _normalizePhoneForWa(t.phone);
-                      await launchUrl(Uri.parse('https://wa.me/$p'),
-                          mode: LaunchMode.externalApplication);
-                    },
-                  ),
-                  const SizedBox(width: 6),
-                  _SmallButton(
-                    label: 'اتصال',
-                    color: AppColors.gold,
-                    icon: Icons.phone_rounded,
-                    onTap: () async {
-                      await launchUrl(Uri.parse('tel:${t.phone}'),
-                          mode: LaunchMode.externalApplication);
-                    },
-                  ),
-                  const SizedBox(width: 6),
-                  _SmallButton(
-                    label: 'دفع',
-                    color: AppColors.charcoal,
-                    icon: Icons.payments_outlined,
-                    isLoading: _isPaying,
-                    onTap: () async {
-                      setState(() => _isPaying = true);
-                      try {
-                        await widget.ref
-                            .read(tenantsRepositoryProvider)
-                            .markPaid(t.id, month: currentMonth());
-                        widget.onPaid();
-                      } catch (_) {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('حدث خطأ',
-                                  style: GoogleFonts.cairo(
-                                      color: Colors.white)),
-                              backgroundColor: AppColors.red,
-                            ),
-                          );
-                        }
-                      } finally {
-                        if (mounted) setState(() => _isPaying = false);
-                      }
-                    },
-                  ),
-                ],
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _SmallButton(
+                label: 'واتساب',
+                color: AppColors.green,
+                icon: Icons.chat,
+                onTap: () async {
+                  final p = _normalizePhoneForWa(t.phone);
+                  await launchUrl(Uri.parse('https://wa.me/$p'),
+                      mode: LaunchMode.externalApplication);
+                },
+              ),
+              const SizedBox(width: 6),
+              _SmallButton(
+                label: 'اتصال',
+                color: AppColors.gold,
+                icon: Icons.phone_rounded,
+                onTap: () async {
+                  await launchUrl(Uri.parse('tel:${t.phone}'),
+                      mode: LaunchMode.externalApplication);
+                },
+              ),
+              const SizedBox(width: 6),
+              _SmallButton(
+                label: 'دفع',
+                color: AppColors.charcoal,
+                icon: Icons.payments_outlined,
+                isLoading: _isPaying,
+                onTap: () async {
+                  setState(() => _isPaying = true);
+                  try {
+                    await widget.ref
+                        .read(tenantsRepositoryProvider)
+                        .markPaid(t.id, month: currentMonth());
+                    widget.onPaid();
+                  } catch (_) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('حدث خطأ',
+                              style: GoogleFonts.cairo(
+                                  color: Colors.white)),
+                          backgroundColor: AppColors.red,
+                        ),
+                      );
+                    }
+                  } finally {
+                    if (mounted) setState(() => _isPaying = false);
+                  }
+                },
               ),
             ],
           ),
@@ -394,7 +395,7 @@ class _SmallButton extends StatelessWidget {
     return GestureDetector(
       onTap: isLoading ? null : onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(8),

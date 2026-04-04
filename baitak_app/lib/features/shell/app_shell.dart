@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/colors.dart';
 import '../apartments/widgets/add_apartment_sheet.dart';
 import '../home/repo/home_repository.dart';
+import '../tenants/widgets/add_tenant_sheet.dart';
 
 class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.child});
@@ -18,18 +19,97 @@ class AppShell extends ConsumerWidget {
     return 0; // /home
   }
 
-  void _showAddApartment(BuildContext context, WidgetRef ref) {
+  void _showAddOptions(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const AddApartmentSheet(),
-    ).then((result) {
-      if (result == true) {
-        ref.invalidate(overviewProvider);
-      }
-    });
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.divider,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'إضافة جديد',
+              style: GoogleFonts.cairo(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.charcoal,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.goldSurface,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.apartment_rounded, color: AppColors.gold),
+              ),
+              title: Text('إضافة شقة', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+              subtitle: Text('أضف شقة جديدة مع غرفها وأسرتها',
+                  style: GoogleFonts.cairo(fontSize: 12, color: AppColors.slate)),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useRootNavigator: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => const AddApartmentSheet(),
+                ).then((r) {
+                  if (r == true) ref.invalidate(overviewProvider);
+                });
+              },
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.greenSurface,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.person_add_rounded, color: AppColors.green),
+              ),
+              title: Text('إضافة ساكن', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+              subtitle: Text('أضف ساكن جديد لأحد الأسرة',
+                  style: GoogleFonts.cairo(fontSize: 12, color: AppColors.slate)),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useRootNavigator: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => const AddTenantSheet(),
+                ).then((r) {
+                  if (r == true) ref.invalidate(overviewProvider);
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -46,7 +126,7 @@ class AppShell extends ConsumerWidget {
       body: child,
       extendBody: true,
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddApartment(context, ref),
+        onPressed: () => _showAddOptions(context, ref),
         backgroundColor: AppColors.gold,
         shape: const CircleBorder(),
         elevation: 4,
