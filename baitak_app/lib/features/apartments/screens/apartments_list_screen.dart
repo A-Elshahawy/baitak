@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/apartment.dart';
 import '../../../core/theme/colors.dart';
-import '../../auth/notifier/auth_notifier.dart';
 import '../repo/apartments_repository.dart';
 import '../widgets/edit_apartment_sheet.dart';
 
@@ -19,15 +18,6 @@ class ApartmentsListScreen extends ConsumerWidget {
       backgroundColor: AppColors.cream,
       appBar: AppBar(
         title: const Text('الشقق'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout_rounded),
-            tooltip: 'تسجيل الخروج',
-            onPressed: () async {
-              await ref.read(authNotifierProvider.notifier).logout();
-            },
-          ),
-        ],
       ),
       body: RefreshIndicator(
         color: AppColors.gold,
