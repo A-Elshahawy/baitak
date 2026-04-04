@@ -63,6 +63,23 @@ class AuthNotifier extends AsyncNotifier<User?> {
     await ref.read(secureStorageProvider).delete(key: 'auth_token');
     state = const AsyncData(null);
   }
+
+  Future<void> loginWithOtp(
+    String phone,
+    String code, {
+    String? name,
+  }) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final result = await ref
+          .read(authRepositoryProvider)
+          .verifyOtp(phone, code, name: name);
+      await ref
+          .read(secureStorageProvider)
+          .write(key: 'auth_token', value: result.accessToken);
+      return await ref.read(authRepositoryProvider).getMe();
+    });
+  }
 }
 
 final authNotifierProvider =

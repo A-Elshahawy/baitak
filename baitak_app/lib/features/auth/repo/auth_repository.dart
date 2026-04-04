@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart' show Dio, Options;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/models/otp.dart';
 import '../../../core/models/user.dart';
 import '../../../core/network/api_client.dart';
 
@@ -47,6 +48,23 @@ class AuthRepository {
     if (commissionRate != null) data['commission_rate'] = commissionRate;
     final response = await _dio.patch('/auth/me', data: data);
     return User.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  Future<void> requestOtp(String phone) async {
+    await _dio.post('/auth/otp/request', data: {'phone': phone});
+  }
+
+  Future<OTPTokenOut> verifyOtp(
+    String phone,
+    String code, {
+    String? name,
+  }) async {
+    final response = await _dio.post('/auth/otp/verify', data: {
+      'phone': phone,
+      'code': code,
+      if (name != null) 'name': name,
+    });
+    return OTPTokenOut.fromJson(response.data as Map<String, dynamic>);
   }
 }
 
