@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     jwt_secret_key: str = "CHANGE_ME"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24
+    whatsapp_token: str = ""
+    whatsapp_phone_id: str = ""
+    otp_ttl_minutes: int = 5
 
     @field_validator("database_url", mode="before")
     @classmethod

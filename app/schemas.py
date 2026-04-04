@@ -22,7 +22,7 @@ class UserOut(BaseModel):
 
     id: int
     name: str
-    email: EmailStr
+    email: EmailStr | None = None
     commission_rate: float
 
 
@@ -171,6 +171,25 @@ class EarningsOut(BaseModel):
     commission_rate: float
     commission_amount: float
     apartments: list[ApartmentStatsOut]
+
+
+# ── OTP ──────────────────────────────────────────────────────────────────────
+
+
+class OTPRequestIn(BaseModel):
+    phone: str
+
+
+class OTPVerifyIn(BaseModel):
+    phone: str
+    code: str
+    name: str | None = None
+
+
+class OTPTokenOut(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    is_new_user: bool
 
 
 # Required for forward-ref resolution (TenantOut inside BedOut)

@@ -21,8 +21,9 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(200))
-    email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
-    hashed_password: Mapped[str] = mapped_column(String(255))
+    email: Mapped[str | None] = mapped_column(String(320), unique=True, index=True, nullable=True)
+    hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(20), unique=True, index=True, nullable=True)
     commission_rate: Mapped[Decimal] = mapped_column(Numeric(4, 2), default=Decimal("0.50"))
 
     apartments: Mapped[list["Apartment"]] = relationship(
@@ -107,3 +108,13 @@ class RentPayment(Base):
     status: Mapped[str] = mapped_column(String(20), default="unpaid")
 
     tenant: Mapped[Tenant] = relationship(back_populates="payments")
+
+
+class OTPCode(Base):
+    __tablename__ = "otp_codes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    phone: Mapped[str] = mapped_column(String(20), index=True)
+    code: Mapped[str] = mapped_column(String(6))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    used: Mapped[bool] = mapped_column(Boolean, default=False)

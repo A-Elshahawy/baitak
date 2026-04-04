@@ -45,7 +45,9 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)) -> U
 async def login(payload: LoginIn, db: AsyncSession = Depends(get_db)) -> TokenOut:
     res = await db.execute(select(User).where(User.email == str(payload.email).lower()))
     user = res.scalar_one_or_none()
-    if not user or not verify_password(payload.password, user.hashed_password):
+    if not user or user.hashed_password is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    if not verify_password(payload.password, user.hashed_password):  # type: ignore[arg-type]
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
     token = create_access_token(str(user.id))
