@@ -1,4 +1,4 @@
-import random
+import secrets
 from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -31,7 +31,7 @@ async def request_otp(
 ) -> dict[str, str]:
     phone = _normalize_phone(payload.phone)
 
-    code = f"{random.randint(100000, 999999)}"
+    code = f"{secrets.randbelow(900_000) + 100_000}"
     expires_at = datetime.now(UTC) + timedelta(minutes=get_settings().otp_ttl_minutes)
 
     otp = OTPCode(phone=phone, code=code, expires_at=expires_at, used=False)
