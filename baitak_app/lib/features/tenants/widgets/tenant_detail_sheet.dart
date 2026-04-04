@@ -7,6 +7,7 @@ import '../../../core/models/tenant.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/utils/phone_utils.dart';
 import '../repo/tenants_repository.dart';
+import 'call_reminder_dialog.dart';
 import 'edit_tenant_sheet.dart';
 
 class TenantDetailSheet extends ConsumerStatefulWidget {
@@ -212,6 +213,24 @@ class _TenantDetailSheetState extends ConsumerState<TenantDetailSheet> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.green,
+                side: const BorderSide(color: AppColors.green),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              icon: const Icon(Icons.notifications_none_rounded, size: 18),
+              label: Text('تذكير بالإيجار',
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.w600)),
+              onPressed: () => showDialog(
+                context: context,
+                builder: (_) => CallReminderDialog(
+                  name: tenant.name,
+                  phone: tenant.phone,
+                ),
+              ),
             ),
             const SizedBox(height: 8),
             Row(
