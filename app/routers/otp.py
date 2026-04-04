@@ -1,7 +1,9 @@
 import secrets
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +13,8 @@ from ..models import OTPCode, User
 from ..schemas import OTPRequestIn, OTPVerifyIn, OTPTokenOut
 from ..security import create_access_token
 from ..services.whatsapp import send_otp_whatsapp
+
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter()
 
@@ -25,7 +29,9 @@ def _normalize_phone(phone: str) -> str:
 
 
 @router.post("/otp/request", status_code=status.HTTP_200_OK)
+@limiter.limit("5/minute")
 async def request_otp(
+    request: Request,
     payload: OTPRequestIn,
     db: AsyncSession = Depends(get_db),
 ) -> dict[str, str]:
