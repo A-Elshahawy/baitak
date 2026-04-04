@@ -734,6 +734,7 @@ TenantWithContext _buildTenantWithContext(
     phone: tenant.phone,
     startDate: tenant.startDate,
     active: tenant.active,
+    hasUnpaid: tenant.hasUnpaid,
     bedId: bed.id,
     bedLabel: bed.label,
     roomName: room.name,

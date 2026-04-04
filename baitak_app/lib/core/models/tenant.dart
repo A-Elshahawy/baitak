@@ -59,6 +59,7 @@ class TenantWithContext extends TenantOut {
     required super.phone,
     required super.startDate,
     required super.active,
+    super.hasUnpaid,
     this.bedId,
     this.bedLabel,
     this.roomName,
