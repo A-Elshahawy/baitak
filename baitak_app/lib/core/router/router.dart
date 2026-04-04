@@ -5,6 +5,8 @@ import '../network/auth_events.dart';
 import '../../features/auth/notifier/auth_notifier.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
+import '../../features/auth/screens/phone_entry_screen.dart';
+import '../../features/auth/screens/otp_verify_screen.dart';
 import '../../features/shell/app_shell.dart';
 import '../../features/home/screens/home_screen.dart';
 import '../../features/apartments/screens/apartments_list_screen.dart';
@@ -26,7 +28,7 @@ class RouterNotifier extends ChangeNotifier {
 
     final isLoggedIn = authState.valueOrNull != null;
     final loc = state.matchedLocation;
-    final isAuthRoute = loc == '/login' || loc == '/register';
+    final isAuthRoute = loc == '/login' || loc == '/register' || loc == '/phone' || loc.startsWith('/otp-verify');
 
     if (!isLoggedIn && !isAuthRoute) return '/login';
     if (isLoggedIn && isAuthRoute) return '/home';
@@ -48,6 +50,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/register',
         builder: (ctx, s) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/phone',
+        builder: (ctx, s) => const PhoneEntryScreen(),
+      ),
+      GoRoute(
+        path: '/otp-verify',
+        builder: (ctx, s) => OTPVerifyScreen(
+          phone: s.uri.queryParameters['phone']!,
+        ),
       ),
       ShellRoute(
         builder: (ctx, s, child) => AppShell(child: child),

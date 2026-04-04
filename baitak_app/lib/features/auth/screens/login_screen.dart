@@ -196,6 +196,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                         ),
+                        const SizedBox(height: 8),
+                        OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            side: const BorderSide(color: AppColors.gold),
+                            foregroundColor: AppColors.gold,
+                          ),
+                          icon: const Icon(Icons.phone_android_outlined, size: 18),
+                          label: Text(
+                            'دخول بالتليفون',
+                            style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
+                          ),
+                          onPressed: () => context.push('/phone'),
+                        ),
                       ],
                     ),
                   ),
