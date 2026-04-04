@@ -119,16 +119,11 @@ class _OTPVerifyScreenState extends ConsumerState<OTPVerifyScreen> {
                 setState(() => _name = name);
                 setState(() => _isLoading = true);
                 try {
-                  await ref
-                      .read(authRepositoryProvider)
-                      .verifyOtp(widget.phone, _codeController.text, name: name);
-                  if (mounted) {
-                    await ref.read(authNotifierProvider.notifier).loginWithOtp(
-                          widget.phone,
-                          _codeController.text,
-                          name: name,
-                        );
-                  }
+                  await ref.read(authNotifierProvider.notifier).loginWithOtp(
+                        widget.phone,
+                        _codeController.text,
+                        name: name,
+                      );
                 } catch (e) {
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(

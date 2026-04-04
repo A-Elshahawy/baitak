@@ -60,21 +60,23 @@ async def verify_otp(
     if not otp_record or otp_record.code != payload.code:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired OTP")
 
-    otp_record.used = True
-    await db.commit()
-
     user_result = await db.execute(select(User).where(User.phone == phone))
     user = user_result.scalar_one_or_none()
 
     if user:
+        otp_record.used = True
+        await db.commit()
         token = create_access_token(str(user.id))
         return OTPTokenOut(access_token=token, is_new_user=False)
 
-    name = payload.name or phone
-    user = User(name=name, phone=phone, hashed_password=None, email=None)
+    if not payload.name:
+        return OTPTokenOut(access_token="", is_new_user=True)
+
+    otp_record.used = True
+    user = User(name=payload.name, phone=phone, hashed_password=None, email=None)
     db.add(user)
     await db.commit()
     await db.refresh(user)
 
     token = create_access_token(str(user.id))
-    return OTPTokenOut(access_token=token, is_new_user=True)
+    return OTPTokenOut(access_token=token, is_new_user=False)
